@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+
+$n = shift(@ARGV);
+srand( $$ << 10 + time() );
+
+while (<>) {
+  if (rand($n) < 1) { print; }
+}
