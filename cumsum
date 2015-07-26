@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+# $Id$
+
+# cumulative sum:
+#  given a file like
+#
+#   a1  text
+#   a2  text
+#    .  text
+#    .  text
+#   aN  text
+#
+# outputs  'sI  aI  text' for each,
+# where sI is the sum 1..I
+#
+
+# NOTE:  this only reads digits chars to make integers.
+# minus sign is not matched (though a simple regexp mod)
+# same for floats (regexp & optionally print format)
+
+$sum = 0;
+while (<>) {
+  if ( /^\s*(\d+)\s*/ ) {
+    $sum += $1;
+  }
+#  printf "%6d\t$_",$sum;
+# 'd' converts to an int and causes truncation...  
+# since $sum is known to be an int, %s is equivalent without
+# these shortcomings.
+  printf "%7s\t$_",$sum;
+}
+
+
