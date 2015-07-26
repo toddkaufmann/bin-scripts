@@ -1,0 +1,97 @@
+#!/usr/bin/perl
+#
+# $Id: datemv,v 1.1 1997/01/22 17:06:24 toad Exp $
+#
+# move a file to file.<date>
+#
+# created:  1997/01/22
+#
+
+sub usage {
+    print STDERR "Usage:\n\t$0 "
+	. "[-nosuffix] "
+	. "[-help] "
+	. "<files>\n";
+    print STDERR "\n mv each file to file.<date>,\n"
+	. "where date is the modification time of file.\n"
+	. "a suffix will be appended if necessary for uniqueness,\n"
+	. "unless -nosuffix is specified, in which case nothing is done.\n"
+	. "-help gives this message and exits.\n";
+}
+
+
+use Getopt::Long;
+if ( ! GetOptions('nosuffix',     # don't append suffix - do nothing if file.<date> already exists
+		  'help',         # just give usage
+		  )
+    || @ARGV == 0          # no files specified
+    || $opt_help ) {
+    &usage;
+    exit 1;
+}
+
+require "ctime.pl";
+
+
+for $f ( @ARGV ) {
+  if ( -d $f ) {
+    $f =~ s=/$==;
+  }
+  if ( ! -e $f ) {
+    print STDERR "$f: does not exist\n";
+    # proceed?  or exit 1 ?
+    next;
+  }
+
+  ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
+   $atime,$mtime,$ctime,$blksize,$blocks)
+    = stat($f);
+#    showtime("atime", $atime, $f);
+#    showtime("mtime", $mtime, $f);
+#    showtime("ctime", $ctime, $f);
+
+    $newf = "$f." . time_to_yymmdd($mtime);
+
+    if ( -e $newf ) {
+	if ( $opt_nosuffix ) {
+	    print STDERR "$newf already exists - nothing done.\n";
+	    next;
+	} else {
+	    my $suf = 'a';
+	    while ( -e "$newf$suf" ) { $suf++; }
+	    $newf .= $suf;
+	}
+    } 
+
+    if (! rename($f,$newf) ) {
+	print STDERR "rename of $f failed - $!\n";
+    } else {
+	# if verbose..
+	print "$f\t -> $newf\n";
+    }
+}
+
+exit 0;
+
+#############################################################################
+## this sub for debugging
+
+sub showtime {
+    local($timename, $time, $f) = @_;
+    my $ct = ctime($time);
+    chomp $ct;
+    print "$timename  $ct  $f\n";
+}
+
+# here's the date format we use
+
+sub time_to_yymmdd {
+    my $t0 = shift;
+
+    local($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) =
+	localtime($t0);
+    # year is since '70..  bring into the present.
+    $year += 1900;
+    # printf "mtime: %02d%02d%02d\n", $year,1+ $mon, $mday;
+    sprintf "%02d%02d%02d", $year,1+ $mon, $mday;
+}
