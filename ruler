@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+
+$columns = $ARGV[0];
+# || $ENV{'COLUMNS'};
+if ( $columns < 1 ) {
+   @rc = split(/ /, `stty size`);
+   $columns = $rc[1] + 0;
+}
+
+# print "0: $ARGV[0], 1: $ARGV[1]  stty: " . $columns . "\n";
+
+$tens = int( $columns/10 );
+$z9 = join('', '_', 1..9 );
+
+
+# 0..9
+for ( 1.. $tens   ) { print $z9; }
+print substr( $z9,              0, $columns - 10*$tens), "\n";
+
+# 'tens' line
+for ( 0.. $tens-1 ) {  print substr( "${_}_________",0,10 );}
+print substr( "$tens         ", 0, $columns - 10*$tens ), "\n";
