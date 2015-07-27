@@ -1,0 +1,23 @@
+#!/bin/bash
+# $Revision: 1054 $
+
+# from:  http://www.cyberciti.biz/faq/convert-epoch-seconds-to-the-current-time-date/
+# date -d @Epoch
+# date -d @1268727836
+# date -d "1970-01-01 1268727836 sec GMT"
+# Sample outputs:
+# 
+# Tue Mar 16 13:53:56 IST 2010
+# Please note that @ feature only works with latest version of date (GNU coreutils v5.3.0+). 
+
+# linux?:
+#date -u --date="1970-01-01 $1 sec GMT"
+# osx:
+date -r $1
+
+# http://www.linuxscrew.com/2007/09/04/two-way-conversion-of-unix-time-seconds-since-1970-and-regular-time/
+# date -u --date="1970-01-01 1187769064 sec GMT"
+# where 1187769064 is input Unix time. The output will be: Wed Aug 22 07:51:04 UTC 2007
+#
+# To get Unix time seconds from regular one format just use:
+# date --date="Wed Aug 22 07:51:04 UTC 2007" +%s
