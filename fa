@@ -1,0 +1,183 @@
+#!/usr/bin/perl
+# $Id: fa,v 1.1 2004/08/12 14:36:12 toad Exp $
+# updates to todd@t-k.org
+
+# parse args
+# not meant to be a replacement for find - feature creep ends there.
+# cf. bsd mtree ?
+
+use Time::HiRes; 
+
+#** todo:
+#  filter mode: -f attr op val
+#  take a format string - with %xx for each type, incl. filename
+#
+#  
+my $funlist = {};  # hash of names to fns
+funlist_init();
+
+my $linkfuns;  # true if any stat links
+
+# Argument processing --
+# Each argument (size,atime,etc) corresponds to a function;
+# build a list of functions to call on each item
+#
+my @attrfuns;
+while (@ARGV) {
+  my $opt = shift(@ARGV);
+  # if '^l', linkfuns
+  last if $opt =~ /-in/;   # after '-in' are files with filenames
+  usage() if $opt =~ /-h/;
+  $linkfuns=1 if $opt =~ /^l/;
+  my $f = $funlist->{$opt};
+  if ( $f ) {
+    push(@attrfuns, $f);
+  } else {
+    warn "unknown attribute '$opt', skipping.\n";
+  }
+}
+
+if ( scalar(@attrfuns) == 0 ) {
+  # If nothing recognizable was specified, give usage and exit.
+  usage();
+}
+
+my @stat;
+my @lstat;
+
+# read files, output attr + file
+while (<>) {
+  chomp;
+  if ( @stat = lstat($_) ) {
+    # if type=l & link funs, set @lstat too.
+    $f = $_;
+    if ( (-l _) && $linkfuns ) { @lstat = stat($_); }
+    # why doesn't this work?
+    # print join("\t", grep( &{$_}, @attrfuns)) . "\t$f\n";
+    my $fun;
+    for $fun (@attrfuns) {
+      print &$fun() . "\t";
+    }
+    print "$f\n";
+  } else {
+    warn "can't stat $f - $!\n";
+  }
+}
+
+exit 0;
+
+sub usage () {
+    print STDERR "Usage:    $0 attr1 attr2 .. attrn < filelist\n";
+    print STDERR "or        $0 attr1 attr2 .. attrn -n filelist\n";
+    print STDERR "where attrs are one of:\n";
+    print STDERR "dev ino mode nlink uid gid rdev size atime mtime ctime blksize blocks\n";
+    print STDERR "('l' preceding the above means the link)\n";
+    print STDERR " atimeh  mtimeh  ctimeh       (human readable times)\n";
+    print STDERR "latimeh lmtimeh lctimeh       (human readable times)\n";
+    print STDERR " atimed  mtimed  ctimed       (age in fractional days)\n";
+    print STDERR "                 stime     sample time (when stat was called)\n";
+    exit 1;
+}
+
+sub funlist_init {
+  $funlist =
+  { 'dev'	=> sub { $stat[ 0]; },  # major * 256 + minor
+    'ino'	=> sub { $stat[ 1]; },
+    'mode'	=> sub { $stat[ 2]; },  # mode & 07777 ?
+    'nlink'	=> sub { $stat[ 3]; },
+    'uid'	=> sub { $stat[ 4]; },
+    'gid'	=> sub { $stat[ 5]; },
+    'rdev'	=> sub { $stat[ 6]; },
+    'size'	=> sub { $stat[ 7]; },
+    'atime'	=> sub { $stat[ 8]; },
+    'mtime'	=> sub { $stat[ 9]; },
+    'ctime'	=> sub { $stat[10]; },
+    'blksize'	=> sub { $stat[11]; },
+    'blocks'	=> sub { $stat[12]; },
+  };
+  # the l* versions -
+  # f = $funlist->{'name'};
+  # $funlist->{'lname'} = sub { local @stat;
+  @statlist = qw(dev ino mode nlink uid gid rdev size atime mtime ctime blksize blocks);
+  my $i=0;
+  for $name (@statlist) {
+    my $index = $i;
+    my $fun = sub { $lstat[$index] };
+    $funlist->{"l$name"} = $fun;
+    $i++; 
+  }
+  $i = 8;
+  for $name ( qw(atimeh mtimeh ctimeh) ) {
+    {
+      # create closure
+      my $index = $i;
+      my $fun = sub { readable_date( $stat[$index] ); };
+      $funlist->{$name} = $fun;
+    }
+    $i++; 
+  }
+  $i = 8;
+  for $name ( qw(latimeh lmtimeh lctimeh) ) {
+    {
+      # create closure
+      my $index = $i;
+      my $fun = sub { readable_date( $lstat[$index] ); };
+      $funlist->{$name} = $fun;
+    }
+    $i++; 
+  }
+  $i = 8;
+  for $name ( qw(atimed mtimed ctimed) ) {
+    {
+      # create closure
+      my $index = $i;
+      my $fun = sub { days_old( $stat[$index] ); };
+      $funlist->{$name} = $fun;
+    }
+    $i++; 
+  }
+  $funlist->{'permbits'} = sub { permbits( $stat[2] ); };
+  # 'sample' time -- time at which the stat is done
+  $funlist->{'stime'} = sub { sprintf("%.5f", Time::HiRes::time()); };
+}
+
+sub permbits {
+  my $b = shift;
+  join('.', unpack('A8 A8',unpack('B*', pack('n', $b))));
+}
+    
+
+# from stat(2):
+##  dev_t         st_dev;      /* device */
+##  ino_t         st_ino;      /* inode */
+##  mode_t        st_mode;     /* protection */
+##  nlink_t       st_nlink;    /* number of hard links */
+##  uid_t         st_uid;      /* user ID of owner */
+##  gid_t         st_gid;      /* group ID of owner */
+##  dev_t         st_rdev;     /* device type (if inode device) */
+##  off_t         st_size;     /* total size, in bytes */
+##  unsigned long st_blksize;  /* blocksize for filesystem I/O */
+##  unsigned long st_blocks;   /* number of blocks allocated */
+##  time_t        st_atime;    /* time of last access */
+##  time_t        st_mtime;    /* time of last modification */
+##  time_t        st_ctime;    /* time of last change */
+
+# does this sort?
+# is
+# yyyymmdd.hhmmss better ?
+#
+sub readable_date {
+  my $ctime = shift;
+  my @t = localtime($ctime);
+  sprintf("%4d.%02d.%02d.%02d:%02d:%02d",
+	  $t[5]+1900,$t[4]+1,$t[3],$t[2],$t[1],$t[0]);
+}
+
+#
+# note:  relative, not absolute times - 
+#
+sub days_old {
+  my $time = shift;
+  my $daysold = ($^T - $time) / 86400.0;
+  sprintf("%6.2f", $daysold);
+}
