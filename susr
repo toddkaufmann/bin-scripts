@@ -1,0 +1,3 @@
+#!/bin/sh
+# sort uniq sort
+exec sort | uniq -c | sort -nr
