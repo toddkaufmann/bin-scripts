@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# in some cases it's better to have multiple different dirs on your path.
+# that could require updating many shell/environments (maybe), logout/login.
+# .. so maybe best of both works is to link temporarily, and add paths for later.
+# 
+
 # notes:
 # - only +x scripts;  some (mine) depend on data being in the same dir where the executable is;
 # if you link the script you will need to link in the data (manually)
@@ -25,7 +30,7 @@ fi
 #LINKING_LOG=`mktemp -t linking.XXXX`
 LINKING_LOG="./.linker.sh-$(date +%Y%m%d.%H%M)"
 
-function log() {
+log() {
     echo $* >> "$LINKING_LOG"
 }
 log "# $(date) - $0 invoked" 
