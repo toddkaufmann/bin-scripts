@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# switch for platform ?
+# this is aquamacs:
+echo Checking in Lib/Prefs..auto-save-list ...
+ls -lt $HOME/"Library/Preferences/Aquamacs Emacs/auto-save-list/"
+echo Checking in  Lib/Cache/..AutoSave ...
+ls -lt ~/Library/Caches/Aquamacs\ Emacs/AutoSave/
