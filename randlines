@@ -1,5 +1,11 @@
 #!/usr/bin/perl
 
+# Take a random sample of lines.  With argument of 2, you'll get approximately 1/2 of the lines back.
+# 100 for 1%.
+
+# Note:  fractional numbers are okay too;
+# an arguemnt of 1.5 will give you 2/3;  1.11111 will give you 90%
+
 $n = shift(@ARGV);
 srand( $$ << 10 + time() );
 
