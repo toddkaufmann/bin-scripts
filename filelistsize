@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+#
+# usage:
+#  filelistsize [-l] [maxsize]
+#
+# -l:   list size with each file
+# maxsize: output files until sum total > nnnn bytes
+#
+# at end, total size is output.
+# (if maxsize specified, to stderr)
+#
+
+# handles links correctly.
+# TODO:
+#  take into account fs/archive overhead associated with each entry:
+#    tar, cpio, ext2, iso9660, reiserfs
+#  gzip'age estimation?
+
+
+$linemode = 0;
+if ($ARGV[0] eq '-l') {
+  shift(@ARGV);
+  $linemode=1;
+}
+
+$maxsize = 0;
+if ($ARGV[0] =~ /^\d+$/) {
+  $maxsize = shift(@ARGV);
+}
+
+$size = 0;
+while (<>) {
+  $f=$_;
+  chomp($f);
+  lstat($f);
+  $fsize = (-s _);
+  $newsize = $size + $fsize;
+  if ( $maxsize ) {
+    if ($newsize > $maxsize) {
+      print STDERR "$size\n";
+      exit 0;
+    }
+    if ( $linemode ) {
+      print "$fsize\t";
+    } 
+    print;
+  } else {
+    if ( $linemode ) {
+      print "$fsize\t$_";
+    }
+  }
+  $size = $newsize;
+}
+    
+if ( $maxsize == 0 ) {
+  print "$size\n";
+}
