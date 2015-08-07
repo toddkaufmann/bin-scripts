@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+
+# parses at least 2 kinds of lines with dates
+
+use strict;
+use Date::Manip qw(ParseDate);
+
+my $date = 0;
+
+while (<>) {
+  #    2015-08-03 21:01:59 
+  if ( /(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d)/ ) { $date = ParseDate($1); }
+  # Mon Aug  3 14:19:45 2015  
+  if ( / (\w.. .\d \d\d:\d\d:\d\d \d\d\d\d)/ ) { $date = ParseDate($1); }
+
+  print "$date\t$_";
+}
