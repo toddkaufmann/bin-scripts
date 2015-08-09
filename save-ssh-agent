@@ -1,0 +1,12 @@
+#!/bin/sh
+# $Id$
+#
+# more persistent agent forwarding, across shell sessions
+# (including screen)
+
+if [ "$SSH_AUTH_SOCK" != "" ]; then
+  rm -f ~/.ssh/sock; ln -s $SSH_AUTH_SOCK ~/.ssh/sock
+  echo declare -x SSH_AUTH_SOCK=~/.ssh/sock > ~/.ssh/ae
+else
+  echo "SSH_AUTH_SOCK not set.  Let me talk to your agent." >&2
+fi
