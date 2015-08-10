@@ -1,0 +1,9 @@
+#!/usr/bin/perl
+# bracket count
+while (<>) {
+ @om = ( m=\[=g );
+ @cm = ( m=\]=g );
+ $to+= $#om +1;
+ $tc+= $#cm +1;
+ printf "%2d %2d $_", $to, $tc;
+}
