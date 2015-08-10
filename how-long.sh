@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 version='$Id: how-long.sh 1997 2015-07-20 12:09:33Z todd $'
 
 # given pid, log and see how long it takes 
@@ -25,8 +25,8 @@ TEMPOUT=`mktemp "$scriptlog.$pid.tmpXXX"`
 # no mktemp?  this is probably fine:
 # TEMPOUT=$scriptlog.$pid.tmp
 
-function running() {  ps -p$pid> "$TEMPOUT.x" && cp "$TEMPOUT.x" "$TEMPOUT"; }
-function cleanup() {  rm -f "$TEMPOUT" "$TEMPOUT.x"; }
+running() {  ps -p$pid> "$TEMPOUT.x" && cp "$TEMPOUT.x" "$TEMPOUT"; }
+cleanup() {  rm -f "$TEMPOUT" "$TEMPOUT.x"; }
 trap cleanup EXIT
 
 # before we go any farther make sure we have the right process / still running.
