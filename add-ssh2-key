@@ -1,0 +1,19 @@
+#!/bin/sh
+# $Id: add-ssh2-key,v 1.2 2004/12/31 21:57:46 toad Exp $
+
+# Install ssh2 key..
+
+remote=$1
+
+if [ "$remote" = "" ]; then
+  echo you must supply a hostname
+  exit 1
+fi
+
+# you can add extra options with $SSH_OPTS...
+# -o 'protocol 1'
+
+#cat $HOME/.ssh/id_dsa.pub \
+ssh-add -L \
+  | ssh $SSH_OPTS $remote \
+  "umask 077; [ -d .ssh ] || mkdir .ssh; cd .ssh; cat >> authorized_keys2; ls -l authorized_keys2"
