@@ -30,9 +30,6 @@ if ( ! GetOptions('nosuffix',     # don't append suffix - do nothing if file.<da
     exit 1;
 }
 
-require "ctime.pl";
-
-
 for $f ( @ARGV ) {
   if ( -d $f ) {
     $f =~ s=/$==;
