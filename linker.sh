@@ -14,10 +14,10 @@
 
 # default name, but can be overridden in the env.
 # this file has one dir per line.  '#' at beginning of line will comment it out.
-: ${DIRLIST:=linker.dirs}
+: ${DIRLIST:="linker.dirs"}
 #
 
-if [ ! -f $DIRLIST ]; then
+if [ ! -f "$DIRLIST" ]; then
     echo
     echo Usage:
     echo you have to at least on dir in "$DIRLIST; or run like:"
@@ -31,7 +31,7 @@ fi
 LINKING_LOG="./.linker.sh-$(date +%Y%m%d.%H%M)"
 
 log() {
-    echo $* >> "$LINKING_LOG"
+    echo "$*" >> "$LINKING_LOG"
 }
 log "# $(date) - $0 invoked" 
 
@@ -42,20 +42,22 @@ sleep 1
 grep -v '^#' "$DIRLIST" | \
  while read dir; do
      if [ -d "$dir" ]; then 
-	 echo ============ processing $dir ...
+	 echo "============ processing $dir ..."
 	 log "# - processing dir=$dir"
 	 for f in "$dir"/* ; do 
-	     if [ -x $f ] ;  then
-		 base=$(basename $f)
+	     if [ -x "$f" ] ;  then
+		 base=$(basename "$f")
 		 if [ ! -f "$base" ]; then
-		     if ln -s $f . ; then
-			 echo added: $f; 
+		     if ln -s "$f" . ; then
+			 echo "added: $f"; 
 			 log "rm ./'$base'"
-		     else 
-			 echo "error linking ($?)"
+		     else
+			 lnstatus=$?
+			 echo "error linking ($lnstatus)"
+			 log  "error linking $f ($lnstatus)"
 		     fi
 		 else 
-		     echo .. is already here: "$f"; 
+		     log "#  .. is already here:  $f"
 		 fi
 	     else 
 		 echo "(is not +x:  $f"
