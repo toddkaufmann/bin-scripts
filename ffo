@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+# 2013, tk
+#
+# ffo - find first occurrence
+#  print the line number where the line is first seen.
+#
+# example:
+#    echo $PATH | perl -pe 's/:/\n/g' | ffo
+#
+# will help you find dups..  cf with nl.
+
+my %seen;   # hash mapping lines to line numbers
+while (<>) {
+  my $lineNumber = $seen{$_};
+  if ( $lineNumber eq undef ) {
+    $lineNumber = $seen{ $_ } = $.;
+  }
+  print "$lineNumber\t$_";
+}
