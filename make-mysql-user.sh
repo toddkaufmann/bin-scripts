@@ -10,13 +10,14 @@
 : ${dbhost:=$3}
 
 cat <<EOF
+-- dbhost is where you access from -- can be localhost or % for any, or a specific hostname or ip (eg your webserver)
 -- all privileges for $user@$dbhost  (with password '$password')
 CREATE USER '$user'@'$dbhost' IDENTIFIED BY '$password';
 GRANT ALL PRIVILEGES ON *.* TO '$user'@'$dbhost' IDENTIFIED BY '$password' 
   WITH GRANT OPTION ;
 
 -- database schema with same name?
-create database `$user`;
+create database \`$user\`;
 
 -- sufficient for backups or export, no modifications
 CREATE USER '$user'@'$dbhost' IDENTIFIED BY '$password'
