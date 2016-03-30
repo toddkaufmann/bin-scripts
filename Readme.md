@@ -12,6 +12,7 @@ More Description coming.
  - **disk-speed.sh** - simple speed test using dd.
  - **fa** - **f**ile **a**ttributes - list size, dates, etc. (anything that stat produces) for files read from stdin.
  - **filelistsize** - sum sizes, or stop outputing names when list reaches a certain size
+ - **harness.sh** - 	A very simple test harness for shell scripts, or to track and record output diffs
  - **how-long.sh** - watch and wait on a process and log when it finishes
  - **kwic.pl** - KeyWord In Context form of grep; regexp matches will all be lined up with context that occurs before and after
  - **linker.sh** - link executables appearing in `linker.dirs` into current directory, for aggregating useful programs from a number of folders (like if you cloned this repo)
