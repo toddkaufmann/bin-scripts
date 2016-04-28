@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+
+use strict;
+ 
+# first file is existing freq
+#  
+my $freqfile = shift(@ARGV);
+my %seen;
+
+open(FREQ, "<$freqfile");
+while (<FREQ>) {
+  next if /^#/;
+  chomp;
+  # assume a format like uniq -c,
+  # or csv format
+  if ( m/^\s*(\d+)\s+(.*)$/ ) {
+    $seen{$2} = $1;
+    next;
+  } 
+  warn "freq line ignored: $_";
+}
+
+while (<>) {
+    chomp;
+    $seen{$_}++;
+}
+
+for my $k ( keys %seen ) {
+    printf "%7d %s\n", $seen{$k}, $k;
+}
+
+exit 0;
