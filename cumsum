@@ -27,7 +27,7 @@ while (<>) {
 # 'd' converts to an int and causes truncation...  
 # since $sum is known to be an int, %s is equivalent without
 # these shortcomings.
-  printf "%7s\t$_",$sum;
+  printf "%7d\t%s",$sum, $_;
 }
 
 
