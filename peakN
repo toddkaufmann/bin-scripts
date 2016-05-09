@@ -69,7 +69,7 @@ sub dump_some_status {
   my @names = sort by_value keys %seen;
   printf "# peak 1:  %4d   %s\n", $seen{ $names[0] }, $names[0] ;
   printf "# peak 2:  %4d   %s\n", $seen{ $names[1] }, $names[1] ;
-  printf "#          %4d  - actual max this period\n", $actual_max;
+  printf "#          %4d  - actual max this period, threshold is %d\n", $actual_max, $threshold;
   $actual_max = 0;
 }
       
