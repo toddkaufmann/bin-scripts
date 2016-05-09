@@ -1,0 +1,75 @@
+#!/usr/bin/perl
+
+use strict;
+my $N = shift @ARGV;    # how big our window is
+my $threshold = shift @ARGV;    # threshold for reporting
+
+my @ring;  # ring buffer, accessed [i mod N]
+my %seen;  # hash of what's seen
+my $actual_max = 0;
+
+my $i = 0;  # index counter  (same as $.)
+while (<>) {
+  next if m/:80 ::1 /;
+  chomp;
+  if (! m/^[a-z.]+:80 ([0-9.]+) / ) {
+    warn "nomatch: $_";
+    next;
+  }
+  my $this_ip = $1;
+
+  # pop from ring
+  my $popped = $ring[ $i % $N ];
+  if ( $popped != '' ) {
+    if ( $popped == $this_ip ) {
+      # no counts to adjust
+      # still warn about threshold ?
+    } else {
+      if ( $seen{$popped}-- == $threshold ) {
+	printf("%5d: .. below: %s\n", $i,  $this_ip);
+      }
+    }     
+  }
+  
+  # push in ring / add count seen (>threshold?  watchlist?)
+  if ( $popped == $this_ip ) {
+    # handled above
+  } else {
+    $ring[ $i % $N ] = $this_ip;
+    $seen{$this_ip}++;
+    if ( $seen{$this_ip} == 2 * $threshold ) {
+      printf("%5d: .. ABOVE ABOVE: %s\n", $i,  $this_ip);
+    } elsif ( $seen{$this_ip} == $threshold ) {
+      printf("%5d: .. above: %s\n", $i,  $this_ip);
+    }
+    if ( $seen{$this_ip} > $actual_max ) {
+      $actual_max = $seen{$this_ip};
+    }
+  }
+
+  $i++;
+  # every N we could output some stats such as:
+  # highest peak
+  # current highest entry
+  if ( $i % $N == 0 ) {
+    dump_some_status();    
+  }
+}
+
+# TODO  handle rotating logs
+
+sub dump_some_status {
+  # $. not same  as $i, because of number of ignored
+  print "============================================ Reached $. lines!   -  " .  `date`;
+  sub by_value {
+    #$main::seen->{$b} <=> $main::seen->{$a};
+    $seen{$b} <=> $seen{$a};
+  }
+
+  my @names = sort by_value keys %seen;
+  printf "# peak 1:  %4d   %s\n", $seen{ $names[0] }, $names[0] ;
+  printf "# peak 2:  %4d   %s\n", $seen{ $names[1] }, $names[1] ;
+  printf "#          %4d  - actual max this period\n", $actual_max;
+  $actual_max = 0;
+}
+      
