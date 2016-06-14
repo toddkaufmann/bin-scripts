@@ -1,0 +1,5 @@
+#!/bin/sh
+
+for ip in $@ ; do
+    curl -si freegeoip.net/csv/"$ip" | egrep "X-Database-Date:|$ip"  | tee -a $HOME/.logs/freegeoip
+done
