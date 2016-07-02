@@ -1,5 +1,9 @@
 #!/usr/bin/perl
 
+# TODO:
+# make this a class, so you can easily have multiple with different parameters
+# eg values of N, threshold, different inputs (ip, networks, url segment, user agent)
+
 use strict;
 my $N = shift @ARGV;    # how big our window is
 my $threshold = shift @ARGV;    # threshold for reporting
