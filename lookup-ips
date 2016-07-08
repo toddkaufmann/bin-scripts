@@ -1,0 +1,34 @@
+#!/usr/bin/perl
+
+#
+# changes lines that have an IP as the last entry
+# appending <tab><tab>name, where name is the name from DNS
+# when the name exists.
+#
+
+$| = 1;
+
+while (<>) {
+    if ( ! /^total/ ) {
+#	if ( /\s([0-9.]+)$/ ) {
+	if ( /\s(\d+\.\d+\.\d+\.\d+)$/ ) {
+	    $ip = $1;
+	    $name = numtoname($ip);
+	    if ( $name ne $ip ) {
+		chomp;
+		$_ = "$_\t\t$name\n";
+	    }
+	}
+    }
+    print;
+}
+
+sub numtoname {
+    local($_) = @_;
+    unless (defined $numtoname{$_}) {
+	local(@a) = gethostbyaddr(pack('C4', split(/\./)),2);
+	$numtoname{$_} = @a > 0 ? $a[0] : $_;
+    }
+    $numtoname{$_} || $_;
+}
+
