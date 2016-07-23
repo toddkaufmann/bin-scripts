@@ -1,0 +1,48 @@
+#!/bin/sh
+version='$Id: ursy 1851 2014-09-25 18:51:07Z todd $'
+
+# usual rsync -- parameters & output,
+#  also log it
+
+# arguments:  src(s) and dests
+#   (like rsync)
+
+scriptlog="$HOME/.logs/ursy"
+
+# rsync  -av --progress --stats $@
+# -s
+# --partial
+cmd='rsync  -av --progress --stats --protect-args --timeout=30'  # just add $@
+
+timestamp=`date +%Y%m%d.%H%M%S`
+(echo "# $timestamp :: $version"; \
+ echo "# wd: " `/bin/pwd`; \
+ echo "# $0 arguments: $@"; \
+ echo "$cmd $@")            >> $scriptlog
+
+#
+if $cmd "$@"; then
+  status=$?
+  statusmsg="success ($status)"
+else 
+  status=$?
+  statusmsg="FAIL ($status)"
+fi
+
+timestamp=`date +%Y%m%d.%H%M%S`
+(echo "# $timestamp completed:  $statusmsg"; \
+ echo )  >> $scriptlog
+
+exit $status
+
+
+
+
+# rsync
+# --delete --backup --backup-dir=/Users/todd/Bitcasa/Bitcasa.ROOT/Bitcasa-dump/original-tk/todd.BAK
+# --suffix=.20140505.0740 --bwlimit=540
+# -s --timeout=210
+# -av --partial --progress --stats
+# /Users/todd/DONT_BACKUP /Users/todd/Bitcasa/Bitcasa.ROOT/Bitcasa-dump/original-tk/todd
+
+
