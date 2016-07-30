@@ -50,7 +50,7 @@ grep -v '^#' "$DIRLIST" | \
 	 echo "============ processing $dir ..."
 	 log "# - processing dir=$dir"
 	 for f in "$dir"/* ; do 
-	     if [ -x "$f" ] ;  then
+	     if [ -x "$f" ] && [ -f "$f" ] ;  then
 		 base=$(basename "$f")
 		 if [ ! -e "$base" ]; then
 		     if ln -s "$f" . ; then
