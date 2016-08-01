@@ -14,7 +14,7 @@ while (<FREQ>) {
   # assume a format like uniq -c,
   # or csv format
   if ( m/^\s*(\d+)\s+(.*)$/ ) {
-    $seen{$2} = $1;
+    $seen{$2} += $1;
     next;
   } 
   warn "freq line ignored: $_";
