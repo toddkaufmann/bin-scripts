@@ -1,0 +1,10 @@
+#!/usr/bin/env perl
+
+# as a one liner--
+# perl -pe 's=(  \d\d\d\d-\d\d-\d\d .\d:\d\d:\d\d )=$1+0000 ='
+
+# TODO:  check that there isn't already a TZ
+while (<>) {
+    s=(  \d\d\d\d-\d\d-\d\d .\d:\d\d:\d\d )=$1+0000 =;
+    print;
+}

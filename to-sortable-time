@@ -16,16 +16,20 @@ use strict;
 use Date::Manip qw(ParseDate UnixDate);
 
 my $date = 0;
+my $TSTDEBUG = $ENV{'TSTDEBUG'};
+#print "DEBUG is $TSTDEBUG\n";
 
 while (<>) {
   # Mon Aug  1 12:38:10 EDT 2016  (with timezone)
   if ( / (\w.. .\d \d\d:\d\d:\d\d ..T \d\d\d\d)/ ) {
     $date = ParseDate($1); 
+    $date .= ' [rule wt]' if $TSTDEBUG;
   }
   # 1469839409 - Fri Jul 29 20:43:29 EDT 2016
   if ( /(1[45]\d\d\d\d\d\d\d\d)/ ) {
     $date = UnixDate("epoch $1", "%O");
     $date = ParseDate($date); 
+    $date .= ' [rule ue]' if $TSTDEBUG;
   }
 
   #    2015-08-03 21:01:59 
@@ -33,10 +37,12 @@ while (<>) {
   # also +/- TZ offset
   if ( /(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d( [-+]\d\d\d\d)?)/ ) { 
     $date = ParseDate($1); 
+    $date .= "\t[rule tzo:$1]" if $TSTDEBUG;  ## TODO others like this
   }
-  # Mon Aug  3 14:19:45 2015  
+  # Mon Aug  3 14:19:45 2015   (emacs file-log)
   if ( / (\w.. .\d \d\d:\d\d:\d\d \d\d\d\d)/ ) {
-    $date = ParseDate($1); 
+    $date = ParseDate($1);
+    $date .= ' [rule efl]' if $TSTDEBUG;
   }
 
   if ( $date ) {
