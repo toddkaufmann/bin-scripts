@@ -1,0 +1,3 @@
+#!/bin/sh
+# courtesy of:  http://www.janosgyerik.com/how-to-shuffle-lines-using-the-command-line/
+perl -MList::Util -e 'print List::Util::shuffle <>'
