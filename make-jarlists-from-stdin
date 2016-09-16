@@ -1,0 +1,20 @@
+#!/bin/sh
+# $Id: make-jarlists-from-stdin 512 2012-04-05 06:44:27Z foo $
+
+# run like this --
+#  find . | egrep 'jar$'  | make-jarlists-from-stdin
+# 
+# you can also specify zip files
+
+# directory for jar listings--
+#
+jarlists=jarlists
+
+[ -d $jarlists ] || mkdir $jarlists
+
+while read jarname; do
+  echo $jarname
+  listfile=`echo "$jarname" | sed -e 's=^./==;s=/=,=g'`
+  #echo "unzip -l $jarname > $jarlists/$listfile"
+  unzip -l "$jarname" > $jarlists/$listfile
+done
