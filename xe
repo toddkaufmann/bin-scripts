@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+# simple xargs escape
+# (assume 1 filename per line)
+
+# man 1 find:
+# BUGS
+#      The special characters used by find are also special characters to many shell pro-
+#      grams.  In particular, the characters ``*'', ``['', ``]'', ``?'', ``('', ``)'',
+#      ``!'', ``\'' and ``;'' may have to be escaped from the shell.
+
+# are those all problems?
+# also, space, quotes,
+# newline, ctrl chars -- these should maybe be an error
+# maybe unicode
+
+# test cases
+#  - a few files w/ a bunch of chars in their names
+#  - then binary search to break down into a bunch of smaller names ?  single chars ?
+#  - or just escape everything not 'safe'.
+# how does stty settings affect ?  or is that only keyboard / pseudo-tty i/o (not pipelines) ?
+while (<>) {
+  s= =\\ =g;
+  print;
+}
