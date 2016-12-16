@@ -56,15 +56,26 @@ while (<>) {
   # highest peak
   # current highest entry
   if ( $i % $N == 0 ) {
-    dump_some_status();    
+    dump_some_status($_);    
   }
 }
 
 # TODO  handle rotating logs
 
 sub dump_some_status {
+  my $line = $_[0];
+  my $datetime = ''; # just for humans
+  # newchristianbiblestudy.org:80 207.46.13.133 - - [24/Apr/2016:06:53:32 +0000] "GET
+  # (\d\d/.../\d\d\d\d:\d\d:\d\d:\d\d
+  if ( $line =~ m=\[([^\]]+)\]= ) {
+    $datetime = $1;
+  } else {
+    warn "can't parse time! - $_";
+    $datetime = `date`;
+    chomp($datetime);
+  }
   # $. not same  as $i, because of number of ignored
-  print "============================================ Reached $. lines!   -  " .  `date`;
+  print "============================================ Reached $. lines!   -  $datetime\n";
   sub by_value {
     #$main::seen->{$b} <=> $main::seen->{$a};
     $seen{$b} <=> $seen{$a};
