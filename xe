@@ -20,5 +20,10 @@
 # how does stty settings affect ?  or is that only keyboard / pseudo-tty i/o (not pipelines) ?
 while (<>) {
   s= =\\ =g;
+  s=([!!@#$%^&*()\[\]\|\\;?<>'"])=\\$1=g;
   print;
 }
+
+# here's a text:
+# touch 'xe-test-[!!@#$%^&*()[]|\;?<>'\''"]'
+# echo xe-test-* | xe | xargs rm
