@@ -9,14 +9,44 @@ if ( $columns < 1 ) {
 
 # print "0: $ARGV[0], 1: $ARGV[1]  stty: " . $columns . "\n";
 
-$tens = int( $columns/10 );
-$z9 = join('', '_', 1..9 );
+# $zero_based = 1;
+# emacs ^X = (what-cursor-position) is zero-based
+# NOTE:  this does not match the number that 'cut' expects, which is +1 
 
+# no arg processing yet.
+$zero_based = 0;
+
+if ( $zero_based ) {
+  # zero (_) through 9
+  $z9 = join('', '_', 1..9 );
+} else {
+  # 9 through zero
+  $z9 = join('',  1..9, '_', );
+}
+
+$tens = int( $columns/10 );
 
 # 0..9
 for ( 1.. $tens   ) { print $z9; }
 print substr( $z9,              0, $columns - 10*$tens), "\n";
 
 # 'tens' line
-for ( 0.. $tens-1 ) {  print substr( "${_}_________",0,10 );}
-print substr( "$tens         ", 0, $columns - 10*$tens ), "\n";
+for ( 0.. $tens-1 ) {
+  if ( $zero_based ) {
+    $tensline =  "${_}_________";
+  print substr( $tensline,0,10 );
+  } else {    
+    $tensline = sprintf("__________%d", 1+$_);
+    #print "$tensline\n";
+    print substr( $tensline,length("$_"),10 );
+  }
+}
+
+if ( $zero_based ) {
+  print substr( "$tens         ", 0, $columns - 10*$tens ), "\n";
+} else {
+    $tensline = sprintf("__________%d", $tens);
+    print substr( $tensline,length("$tens"), $columns - 10*$tens );
+    print "\n";
+}
+
