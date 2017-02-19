@@ -50,12 +50,12 @@ while (<>) {
   chomp;
   s/^\s+//; # usually you want, how to turn off ?  ./ prefix your files ?
   # trailing space as well ?
-  if ( @stat = lstat($_) ) {
+  $f = $_;  # attrfuns may overwrite $_
+  if ( @stat = lstat($f) ) {
     # if type=l & link funs, set @lstat too.
-    $f = $_;
-    if ( (-l _) && $linkfuns ) { @lstat = stat($_); }
+    if ( (-l _) && $linkfuns ) { @lstat = stat($f); }
     # why doesn't this work?
-    # print join("\t", grep( &{$_}, @attrfuns)) . "\t$f\n";
+    # print join("\t", grep( &{$f}, @attrfuns)) . "\t$f\n";
     my $fun;
     for $fun (@attrfuns) {
       print &$fun() . "\t";
