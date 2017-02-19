@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# TEST : ~
+
 # Create symbolic links to executable files in multiple directories.
 # The file in $DIRLIST should contain a list of directories.
 # $DIRLIST defaults to 'linker.dirs' in the current directory but can be overridden on command line.
@@ -50,28 +52,32 @@ grep -v '^#' "$DIRLIST" | \
 	 echo "============ processing $dir ..."
 	 log "# - processing dir=$dir"
 	 for f in "$dir"/* ; do 
-	     if [ -x "$f" ] && [ -f "$f" ] ;  then
-		 base=$(basename "$f")
-		 if [ ! -e "$base" ]; then
-		     if ln -s "$f" . ; then
-			 echo "added: $f"; 
-			 log "rm ./'$base'"
-		     else
-			 lnstatus=$?
-			 echo "error linking ($lnstatus)"
-			 log  "# error linking $f ($lnstatus)"
-		     fi
-		 else 
-		     log "#  .. is already here:  $f"
-		 fi
-	     else 
-		 echo "(is not +x:  $f"
-	     fi
+	     case "$f" in
+		 *~) echo "# [ignore backup file: $f]";;
+		 *)
+		     if [ -x "$f" ] && [ -f "$f" ] ;  then
+			 base=$(basename "$f")
+			 if [ ! -e "$base" ]; then
+			     if ln -s "$f" . ; then
+				 echo "added: $f"; 
+				 log "rm ./'$base'"
+			     else
+				 lnstatus=$?
+				 echo "error linking ($lnstatus)"
+				 log  "# error linking $f ($lnstatus)"
+			     fi
+			 else 
+			     log "#  .. is already here:  $f"
+			 fi
+		     else 
+			 echo "(is not +x:  $f"
+		     fi;;
+	     esac
 	 done
      else
 	 echo "X X X  dir does not exist: $dir"
      fi
-done 
+ done 
 
 echo
 echo '# you can undo all these links (if any) by executing this script:'
