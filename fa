@@ -48,6 +48,8 @@ my @lstat;
 # read files, output attr + file
 while (<>) {
   chomp;
+  s/^\s+//; # usually you want, how to turn off ?  ./ prefix your files ?
+  # trailing space as well ?
   if ( @stat = lstat($_) ) {
     # if type=l & link funs, set @lstat too.
     $f = $_;
