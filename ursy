@@ -9,6 +9,8 @@ version='$Id: ursy 1851 2014-09-25 18:51:07Z todd $'
 
 scriptlog="$HOME/.logs/ursy"
 
+[ -d "$HOME/.logs" ] || mkdir "$HOME/.logs"
+
 # rsync  -av --progress --stats $@
 # -s
 # --partial
