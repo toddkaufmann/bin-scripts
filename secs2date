@@ -13,7 +13,13 @@
 # linux?:
 #date -u --date="1970-01-01 $1 sec GMT"
 # osx:
-date -r $1
+
+if [[ $(uname -o) =~ Linux ]]; then
+    date -d @$1
+else
+    # assume OSX 
+    date -r $1
+fi
 
 # http://www.linuxscrew.com/2007/09/04/two-way-conversion-of-unix-time-seconds-since-1970-and-regular-time/
 # date -u --date="1970-01-01 1187769064 sec GMT"
