@@ -69,8 +69,9 @@ grep -v '^#' "$DIRLIST" | \
 			 else 
 			     log "#  .. is already here:  $f"
 			 fi
-		     else 
-			 echo "(is not +x:  $f"
+		     else
+			 # too noise, just log:
+			 log "# (is not +x:  $f"
 		     fi;;
 	     esac
 	 done
@@ -80,7 +81,7 @@ grep -v '^#' "$DIRLIST" | \
  done 
 
 echo
-echo '# you can undo all these links (if any) by executing this script:'
+echo '# you can undo all these links (if any) by executing this script, which also contains a full summary:'
 echo "sh $LINKING_LOG"
 
 
