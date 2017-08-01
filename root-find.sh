@@ -1,4 +1,6 @@
-#!/bin/sh
+#!/bin/bash
+# to do:  add inode ?
+#  fork repo, add scripts to gather interesting stats etc
 HEADER="# version: $0 "'$Revision: 1944 $'
 # UUID is meant to be updated whenever file format/header changes
 UUID='1A418825-ED2F-4B2E-94B2-33DA497384E9'
@@ -37,6 +39,8 @@ else
   fi
 fi
 out="$HOME/$prefix.find.$timestamp"
+
+[ -d "$HOME/.logs" ] || mkdir "$HOME/.logs"
 
 scriptlog="$HOME/.logs/root-find"
 echo "# $timestamp cwd is : "`pwd`, out is : $out  >> $scriptlog
