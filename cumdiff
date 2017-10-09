@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+
+# diff again prev. number
+
+$last = 0;
+while (<>) {
+  if ( /^\s*(\d+)\s*/ ) {
+    # $sum += $1;
+    $current = $1;
+    $diff = $current - $last;
+    $last = $current;
+    printf "%7d\t%s",$diff, $_;
+  } else {
+      printf "%7s\t%s","", $_;
+  }
+}
