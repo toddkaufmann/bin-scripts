@@ -1,0 +1,11 @@
+#!/bin/sh
+
+timestamp () {     date +%Y%m%d.%H%M; }
+# datestamp () {    date +%Y%m%d; }
+# microstamp() { date --iso-8601=ns | cut -c1-26; }
+
+# seconds:
+secondstamp () {     date +%Y%m%d.%H%M%S; }
+
+fn=$(secondstamp).$(echo $* | sed -e 's= =_=g; s=/=_=g;')
+echo "$fn"
