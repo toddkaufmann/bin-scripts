@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# this could:
+# do stty -a, and only report update when output is different
+
+for nn in {1..45}; do stty -a | head -1 | cut -c18-38; sleep 2; done
+
+# should be a one-liner
+
+# how to get feedback
+cat <<ideas
+watch for cmd status in one-liner
+update your usage stats
+(time, place (situation?), conditions, directory)  -- might all be factors
+eg, do you only run w/ other cmd ?
+during dev?  from certain dirs ?
+
+how to get notifications ?  occasionally :  maintenance mode
+or, auto
+auto / crypto
+
+re: stats above:  
+could range from 
+use, time of each;
+time + other stats (load, folder, args, runtime)
+a seq. of fail,fail,fail,work ...  fail,fail,work ...  
+may indicate a documentation clarity problem
+
+"related" .. etc.
+
+development of a whitelisting / blacklisting set of rules
+set of tools
+
+eg one-liners --
+a community might have a collection of scripts
+maybe even for a post
+
+gitpost
+
+ideas
