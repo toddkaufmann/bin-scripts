@@ -8,6 +8,17 @@ if [ "$EUID" != "0" ]; then
    echo try again, as root
    exit 1
 fi
+
+set -e
+set -u
+
+codename=$(lsb_release -s -c)
+if [ "$codename" != "yakkety" ]; then
+    echo "I don't know how to handle '$codename' yet; "
+    echo "you can try the steps manually or use them to help you find answers online."
+    echo "If you have updates/fixes, send them to me.  Thanks."
+    exit 1
+fi
 curl http://winswitch.org/gpg.asc | apt-key add -
 
 echo "deb http://winswitch.org/ yakkety main" > /etc/apt/sources.list.d/winswitch.list;
