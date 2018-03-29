@@ -29,7 +29,7 @@ if [ "$arg1" == "" ]; then
   prefix=root
 else 
   if pushd "$arg1"; then
-    prefix=$(echo "$arg1" | sed -e 's=/$==; s=/=_=g;')
+    prefix=$(echo "$arg1" | sed -e 's=/$==; s=[ /]=_=g;')
   else
     echo
     echo "** Can't cd to $arg1 -- check arguments"
@@ -64,7 +64,13 @@ DEV_UUID=`diskutil info "$FS" | perl -ne 'print "$1\n" if /UUID:\s+(.*)/'`
  echo "# Folder: $(pwd -P)" ) \
  > "$out.out"
 
-time find . -xdev 2>$out.find-err  | ~todd/bin/fa stime permbits atimeh ctimeh size 2>$out.fa-err >> $out.out 
+# TODO include ino nlinks
+#  how can we go faster, and skip stat'ing everything ?
+#  cache (in db), only look for dir change and then enumerate.
+#  [test:  how many change between ?]
+#    changes 'without evidence':  eg add/del, or mv/rename ?
+#
+time find . -xdev 2>"$out.find-err"  | ~todd/bin/fa stime permbits atimeh ctimeh size 2> "$out.fa-err" >> "$out.out"
 
 popd
 
@@ -75,7 +81,7 @@ if [ "$arg1" == "" ]; then
   else
     echo "# creating symlink:  $out.out -> rf.out"
   fi
-  ln -s $out.out rf.out
+  ln -s "$out.out" rf.out
 fi
 
 echo "$0 $@ " >> $scriptlog
