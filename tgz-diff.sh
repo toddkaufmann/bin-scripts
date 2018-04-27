@@ -3,6 +3,10 @@
 # TODO:  parse args, check two supplied
 # select ignore-dirs or not
 
+# improvement:   look at PIPESTATUS .. not sure if it can tell that tar fails (v. grep)
+#  'end of file' indicates a corrupted tar file -- that could be deleted, or mv to $file.corrupted
+
+
 set -eu
 
 function tgz-diff() {
@@ -22,10 +26,9 @@ function tgz-diff-ignore-dirs() {
 }
 
 # usually dirs only matter w/ times, and if anything of import there will probably be files involved.
-echo CMD: tgz-diff "$1" "$2"
- tgz-diff "$1" "$2"
-echo  tgz-diff status: $?
-echo --
-echo CMD: tgz-diff-ignore-dirs "$1" "$2"
+#echo CMD: tgz-diff "$1" "$2"
+# tgz-diff "$1" "$2"
+
+#echo CMD: tgz-diff-ignore-dirs "$1" "$2"
 tgz-diff-ignore-dirs "$1" "$2"
-echo  tgz-diff-ignore-dirs status: $?
+#echo  tgz-diff-ignore-dirs status: $?
