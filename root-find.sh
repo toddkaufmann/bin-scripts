@@ -1,12 +1,14 @@
 #!/bin/bash
 # to do:  add inode ?
 #  fork repo, add scripts to gather interesting stats etc
-HEADER="# version: $0 "'$Revision: 1944 $'
-# UUID is meant to be updated whenever file format/header changes
-UUID='1A418825-ED2F-4B2E-94B2-33DA497384E9'
-# v1.3: UUID='11739C79-F648-4C57-8023-19525165BE21'
-# v1.2: UUID='1865F58A-EACA-4FCF-8B29-FCA21ADF9B6F'
-ID='$Id: root-find.sh,v 1.3 2011/05/26 21:35:22 todd Exp $'
+HEADER="# version: $0 2018.04.30"
+# PROG_VERSION_UUID is meant to be updated whenever file format/header changes
+PROG_VERSION_UUID='1A418825-ED2F-4B2E-94B2-33DA497384E9'
+# v1.3: PROG_VERSION_UUID='11739C79-F648-4C57-8023-19525165BE21'
+# v1.2: PROG_VERSION_UUID='1865F58A-EACA-4FCF-8B29-FCA21ADF9B6F'
+
+# HISTORY:
+#  root-find.sh,v 1.3 2011/05/26 21:35:22
 # 
 #
 # run with no arguments;
@@ -21,7 +23,7 @@ ID='$Id: root-find.sh,v 1.3 2011/05/26 21:35:22 todd Exp $'
 
 # 11/7  with arg:  is a subdir name and filename prefix instead of root
 # 11/23 with arg:  ignore trailing slash, and convert '/' to '_' in output filename.
-timestamp=`date +%Y%m%d.%H%M`
+timestamp=$(date +%Y%m%d.%H%M)
 
 arg1="$1"
 if [ "$arg1" == "" ]; then
@@ -43,28 +45,36 @@ out="$HOME/$prefix.find.$timestamp"
 [ -d "$HOME/.logs" ] || mkdir "$HOME/.logs"
 
 scriptlog="$HOME/.logs/root-find"
-echo "# $timestamp cwd is : "`pwd`, out is : $out  >> $scriptlog
+echo "# $timestamp cwd is : $(pwd), out is : $out"  >> "$scriptlog"
 
 
-echo cwd is : `pwd`
-echo out is : $out
+echo cwd is : "$(pwd)"
+echo out is : "$out"
 #exit 0
 
 # output identifying header so we know what format to expect
 
-FS=`df . | tail -1 | sed -e 's/.*[0-9]%  *//' `
-# works for OS X:
-DEV_UUID=`diskutil info "$FS" | perl -ne 'print "$1\n" if /UUID:\s+(.*)/'`
+dfline=$(df . | tail -1)
+#blkdev=$(echo $dfline | sed -e 's= .*==' )
+blkdev=${dfline/ */}
+#       $(echo $dfline | sed -e 's= .*==' )
+FS=${dfline/*%/}
 
+if [ Darwin = "$(uname -s)" ]; then
+  # works for OS X:
+  DEV_UUID=$(diskutil info "$blkdev" | perl -ne 'print "$1\n" if /UUID:\s+(.*)/')
+else
+  DEV_UUID=$(blkid "$blkdev")
+fi
 
 (echo "$HEADER"; \
- echo "# $UUID"; \
- echo "# run at:" `date` on `hostname`; \
+ echo "# $PROG_VERSION_UUID"; \
+ echo "# run at: $(date) on $(hostname)"; \
  echo "# Filesystem: $FS :: $DEV_UUID"; \
  echo "# Folder: $(pwd -P)" ) \
  > "$out.out"
 
-time find . -xdev 2>$out.find-err  | ~todd/bin/fa stime permbits atimeh ctimeh size 2>$out.fa-err >> $out.out 
+time find . -xdev 2>"$out".find-err  | ~todd/bin/fa stime permbits atimeh ctimeh size 2>"$out".fa-err >> "$out".out 
 
 popd
 
@@ -75,7 +85,7 @@ if [ "$arg1" == "" ]; then
   else
     echo "# creating symlink:  $out.out -> rf.out"
   fi
-  ln -s $out.out rf.out
+  ln -s "$out".out rf.out
 fi
 
-echo "$0 $@ " >> $scriptlog
+echo "$0 $*" >> "$scriptlog"
