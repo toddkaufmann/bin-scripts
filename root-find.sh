@@ -76,7 +76,8 @@ fi
  echo "# Filesystem: $FS :: $DEV_UUID"; \
  echo "# Folder: $(pwd -P)"; \
  time find . -xdev 2>"$out".find-err \
-     | ~todd/bin/fa stime permbits atimeh ctimeh size 2>"$out".fa-err) \
+     | ~todd/bin/fa stime permbits atimeh ctimeh size 2>"$out".fa-err; \
+ echo "# finished: $(date)") \
     | gzip > "$out.out.gz"
 
 popd
