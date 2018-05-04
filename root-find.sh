@@ -25,21 +25,28 @@ PROG_VERSION_UUID='1A418825-ED2F-4B2E-94B2-33DA497384E9'
 # 11/23 with arg:  ignore trailing slash, and convert '/' to '_' in output filename.
 timestamp=$(date +%Y%m%d.%H%M)
 
-arg1="$1"
-if [ "$arg1" == "" ]; then
-  pushd /
-  prefix=root
-else 
-  if pushd "$arg1"; then
+set -eu
+
+#: "${arg1:=/}"
+arg1=${1-/}
+#echo arg1=$arg1
+
+if [ "$arg1" == "" ] ||  [ "$arg1" == "/" ]; then
+    arg1=/
+    prefix=root
+else
+    arg1="$1"
     prefix=$(echo "$arg1" | sed -e 's=/$==; s=/=_=g;')
-  else
+fi
+
+if ! pushd "$arg1"; then
     echo
     echo "** Can't cd to $arg1 -- check arguments"
     echo "** Exit 1"
     echo
     exit 1
   fi
-fi
+
 out="$HOME/$prefix.find.$timestamp"
 
 [ -d "$HOME/.logs" ] || mkdir "$HOME/.logs"
@@ -74,7 +81,7 @@ fi
  echo "# Folder: $(pwd -P)" ) \
  > "$out.out"
 
-time find . -xdev 2>"$out".find-err  | ~todd/bin/fa stime permbits atimeh ctimeh size 2>"$out".fa-err >> "$out".out 
+time find . -xdev 2>"$out".find-err  | fa stime permbits atimeh ctimeh size 2>"$out".fa-err >> "$out".out 
 
 popd
 
