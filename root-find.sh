@@ -28,21 +28,28 @@ set -eu
 
 timestamp=$(date +%Y%m%d.%H%M)
 
-arg1="$1"
-if [ "$arg1" == "" ]; then
-  pushd /
-  prefix=root
-else 
-  if pushd "$arg1" >/dev/null; then
+set -eu
+
+#: "${arg1:=/}"
+arg1=${1-/}
+#echo arg1=$arg1
+
+if [ "$arg1" == "" ] ||  [ "$arg1" == "/" ]; then
+    arg1=/
+    prefix=root
+else
+    arg1="$1"
     prefix=$(echo "$arg1" | sed -e 's=/$==; s=/=_=g;')
-  else
+fi
+
+if ! pushd "$arg1"; then
     echo
     echo "** Can't cd to $arg1 -- check arguments"
     echo "** Exit 1"
     echo
     exit 1
   fi
-fi
+
 out="$HOME/$prefix.find.$timestamp"
 
 [ -d "$HOME/.logs" ] || mkdir "$HOME/.logs"
