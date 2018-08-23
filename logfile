@@ -7,5 +7,15 @@ timestamp () {     date +%Y%m%d.%H%M; }
 # seconds:
 secondstamp () {     date +%Y%m%d.%H%M%S; }
 
-fn=$(secondstamp).$(echo $* | sed -e 's= =_=g; s=/=_=g;')
+# use tr for the name, and some test cases
+# would be nice
+# general log tagging,
+# - eg store some type in loc.x
+# - tags for retrieval or easy reference
+#   eg,   lastlog=$(lastlog with this tag)
+#   but why didnt you just think of that before ?
+# .. about breaking habits ..
+#
+#
+fn=$(secondstamp).$(echo "$@" | sed -e 's= =_=g; s=/=_=g;')
 echo "$fn"
