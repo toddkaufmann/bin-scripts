@@ -1,7 +1,7 @@
 #!/bin/bash
 # to do:  add inode ?
 #  fork repo, add scripts to gather interesting stats etc
-HEADER="# version: $0 2018.05.02"
+HEADER="# version: $0 2018.06.15"
 # PROG_VERSION_UUID is meant to be updated whenever file format/header changes
 PROG_VERSION_UUID='1A418825-ED2F-4B2E-94B2-33DA497384E9'
 # v1.3: PROG_VERSION_UUID='11739C79-F648-4C57-8023-19525165BE21'
@@ -74,7 +74,13 @@ if [ Darwin = "$(uname -s)" ]; then
   # works for OS X:
   DEV_UUID=$(diskutil info "$blkdev" | perl -ne 'print "$1\n" if /UUID:\s+(.*)/')
 else
-  DEV_UUID=$(blkid "$blkdev")
+    if ! [ -d "$blkdev" ]; then
+	# case for /dev/root not existing..
+	# maybe a better solution all-around ?
+	blkdev=$(mount|grep ' / '|cut -d' ' -f 1)
+    fi
+    # this is more than just UUID .. includes device.
+    DEV_UUID=$(blkid "$blkdev")
 fi
 
 (echo "$HEADER"; \
@@ -83,20 +89,22 @@ fi
  echo "# Filesystem: $FS :: $DEV_UUID"; \
  echo "# Folder: $(pwd -P)"; \
  time find . -xdev 2>"$out".find-err \
-     | ~todd/bin/fa stime permbits atimeh ctimeh size 2>"$out".fa-err; \
+     | fa stime permbits atimeh ctimeh size 2>"$out".fa-err; \
  echo "# finished: $(date)") \
     | gzip > "$out.out.gz"
 
 popd
 
-if [ "$arg1" == "" ]; then
-  if [ -L rf.out ]; then
+
+if [ "$arg1" == "/" ]; then
+    symlink=rf.out.gz
+    if [ -L "$symlink" ]; then
     echo '# adjusting symlink..'
-    rm rf.out
+    rm "$symlink"
   else
-    echo "# creating symlink:  $out.out.gz -> rf.out.gz"
+    echo "# creating symlink:  $out.out.gz -> $symlink"
   fi
-  ln -s "$out.out".gz rf.out.gz
+  ln -s "$out.out".gz "$symlink"
 fi
 
 echo "$0 $*" >> "$scriptlog"
