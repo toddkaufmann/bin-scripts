@@ -1,5 +1,13 @@
 #!/bin/sh
 
+# urn like:
+#  $0 *.gz
+#  $0 *.tar.gz
+
+# for each .gz file, will create a .7z file.
+# you delete .gz yourself if you what
+# example command is output when all done.
+
 set -eu
 
 # works will with *sql.gz
