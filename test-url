@@ -1,0 +1,190 @@
+#!/bin/bash
+#
+# version history
+# 1.0 initial
+# 1.1 'url' server added
+#
+version=1.1
+
+function usage() {
+    cat <<EOF
+
+USAGE:
+        $0 server  path-or-file
+
+'server' is a scheme + fully qualified host, eg  https://example.com
+(or known abbrevs:  local, or an alias you add below),
+or 'url' if the file contains full URLs.
+
+'path-or-file' is a single server path, or name of a file containing a list, one per line
+(blank and # comment lines will be ignore)
+
+Each path will be tested against server, with output to  <filename>-yyyymmdd.hhmm-out.txt
+for later comparison
+EOF
+    exit 1   
+}
+
+# override to change rate of testing
+: ${SLEEP=1}
+
+
+server="$1"
+if [ "$server" == "" ]; then
+    usage
+fi
+shift
+
+url_or_file="$1"
+if [ "$url_or_file" == "" ]; then
+    usage
+fi
+
+set -u
+set -e
+
+# Without a timeout, curl could hang indefinitely.
+# These values should be generously sufficient.
+connect_timeout=2
+max_time=15
+
+COMMAND="curl -si --user-agent test-url/1.0 --connect-timeout $connect_timeout --max-time $max_time"
+
+
+function test_url() {
+    local server=$1
+    local path=$2
+
+    local url="$server$path"
+    #local  pstatus
+    #declare -a pstatus
+
+    set +e
+    $COMMAND "$url" | { head -30; cat >/dev/null; }  | egrep --text '^HTTP/1|^Location:|<title>'
+   # set | grep PIPEST >> /tmp/tt.debug
+    
+    local  status=${PIPESTATUS[0]}
+    #local hstatus=n/a # ${PIPESTATUS[1]}
+    # local gstatus=${PIPESTATUS[2]}
+    case $status in
+	23) :;;  # can't write all to 'head' .. s'okay.
+	0)  : success ;;  #
+	6)
+	    echo "#! unable to resolve host  $server";
+	    echo "#! command:  $COMMAND \"$url\"";
+	    sleep 20;;
+	7)
+	    echo "#! FAILED TO CONNECT after $connect_timeout seconds"; sleep 1;;
+	28)
+	    echo "#! TIMEOUT - no output in max_time=$max_time seconds.";
+	    sleep 2;;
+	51)
+	    echo "#! SSL certificate was not OK."; sleep 1;;
+	*)
+	    echo "#! Unhandled status (see curl), please investigate - status $status "
+	    echo "#! command:  $COMMAND \"$url\"";
+	    sleep 2;;
+    esac
+    set -e
+}
+
+
+function test_1() {
+    local server=$1
+    local path=$2
+
+    test_url "$server" "$path"
+
+    # temp output, nothing special
+    # show summary
+}
+
+
+## helper??
+#  watch <file> then <action>
+#  watch foo.twig  then test-url
+#
+
+function test_file() {
+    local server=$1
+    local path=$2
+    local output="$3"
+
+    # { echo "# Path: $path"; test_url "$server" "$path"; echo; }
+    
+    { echo "# Path: $path"; test_url "$server" "$path"; echo; } | tee -a "$3"
+    
+}
+
+
+# fix up server name
+
+case "$server" in
+    local)
+	# alias for local testing; assumes :80 but you could change
+	server=localhost;;
+    short1)
+	# for convenience you could define shortname(s) here
+	server='https://your-long-domain-name.org';;
+    url*)
+	# full URLs are listed, not paths
+	server=URL
+esac
+
+
+function timestamp () {     date +%Y%m%d.%H%M; }
+
+function header() {
+    local server="$1"
+    local inname="$2"
+    local tstamp="$3"
+    cat <<EOF
+## v$version test-url 
+## $tstamp  server: $server  input:  $inname
+#
+
+EOF
+}
+
+
+tstamp=$(timestamp)
+
+if [ -f "$url_or_file" ]; then
+    #file=$urlfile
+    : ${output:=$(dirname "$url_or_file")/$(basename "$url_or_file" .txt)-$tstamp-out.txt}
+    echo
+    echo "***  Output will  be saved to:   $output"
+    echo
+    echo
+    # start fresh
+    echo -n > "$output"
+    header "$server" "$url_or_file" "$tstamp" | tee -a "$output"
+    line=1
+    egrep -v '^[ 	]*$|^#' "$url_or_file" \
+	| while read path; do
+	echo "## $line."
+	if [ "$server" = URL ]; then
+	    test_file "" "$path" "$output"	    
+	else
+	    test_file "$server" "$path" "$output"
+	fi
+	sleep "$SLEEP"
+	line=$((line+1))
+    done
+
+    echo Summary:
+    echo
+    egrep 'HTTP/|#!' "$output" | sort | uniq -c | sort -nr
+    echo
+    echo "***  See output in:   $output"
+    echo
+    ls -l "$output"
+    echo
+    
+else
+    echo just one path ..
+fi
+    
+
+exit 0
+
