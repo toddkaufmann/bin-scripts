@@ -15,5 +15,5 @@ fi
 
 #cat $HOME/.ssh/id_dsa.pub \
 ssh-add -L \
-  | ssh $SSH_OPTS $remote \
+  | ssh -o VisualHostKey=yes $SSH_OPTS $remote \
   "umask 077; [ -d .ssh ] || mkdir .ssh; cd .ssh; cat >> authorized_keys2; ls -l authorized_keys2"
