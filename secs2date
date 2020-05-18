@@ -17,7 +17,7 @@
 # for a in $@ ...
 
 secs2date() {
-    if [[ $(uname -o) =~ Linux ]]; then
+    if [[ $(uname -s) =~ Linux ]]; then
 	date -d @"$1"
     else
 	# assume OSX 
