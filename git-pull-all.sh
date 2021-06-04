@@ -19,7 +19,7 @@ function pull-all() {
 			echo check it out -
 			sleep 1
 			if ! git pull; then
-			    echo pull FAIL -  $!
+			    echo pull FAIL -  $?
 			fi
 			echo
 			git lol | head
