@@ -1,0 +1,32 @@
+#!/bin/bash
+
+function grep-all() {
+    for repo in */; do
+	echo $(date) ============================================ $repo;
+	if cd $repo; then
+	    #echo CMD: git grep "$*"; sleep .5
+	    echo CMD: git grep "$@"; sleep .5
+	    # no?:  "$*"
+	    # if git grep $@; then
+	    if git grep "$@"; then
+		echo success?;
+	    else
+		gstat=$?
+		if [ $gstat == 1 ]; then
+		    # normal
+		    sleep .5
+		else
+		    echo
+		    echo STATUS $?;
+		    echo
+		    sleep 5;
+		fi
+	    fi;
+	    cd ..;
+	fi;
+    done;
+}
+
+echo Calling: grep-all "$*"
+grep-all "$@"
+
