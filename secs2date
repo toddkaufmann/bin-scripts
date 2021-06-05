@@ -17,16 +17,27 @@
 # for a in $@ ...
 
 secs2date() {
+    local number="$1"
+    # truncate to 10 digits:  handles case of fractional, msecs or nsecs
+    # Note:  if you want dates before 2002, or after 2286, 
+    #  this will break it for you.
+    # TODO:  trunct fractional part (and add back on?)
+    #  only assume msecs/nsecs when #digits >= 12, and then remove 3/6.
+    local epoch_secs=$(echo $number | cut -c1-10)
     if [[ $(uname -s) =~ Linux ]]; then
-	date -d @"$1"
+	date -d @"$epoch_secs"
     else
 	# assume OSX 
-	date -r "$1"
+	date -r "$epoch_secs"
     fi
 }
 
 
 for secs in "$@"; do
+    # additional regexps -
+    # 1613794054.652693 (fractional)
+    # 1613794054652693 nsecs
+    # 1613794054652 msec
     printf '%d\t%s\n' "$secs" "$(secs2date "$secs")"
 done
 
