@@ -22,6 +22,7 @@ function pull-all() {
 			    echo pull FAIL -  $?
 			fi
 			echo
+# TODO:  add / replace with alias for lol.  meanwhile you can change to just log
 			git lol | head
 			echo
 			read -p " << any char to proceed>> " -n 1
