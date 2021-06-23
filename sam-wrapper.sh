@@ -7,9 +7,19 @@ set -eu
 cmd="$1"
 shift
 
+function logger() {
+    local LOGFILE=~/.logs/sam-wrapper 
+    if [ -f $LOGFILE ]; then
+	# echo "$(date) $0 $*" >> $LOGFILE
+	echo "$(date) $0 $@" >> $LOGFILE
+    fi
+    echo "$(date) $0 $*"
+}
+
 case "$cmd" in
     --info)
 	# '--info' returns json parsed by some IDEs, outputing extra text will break Pycharm/sam
+	# as of 2021-06-04 I have:  {"version": "1.23.0"} 
 	exec /usr/local/bin/sam $cmd
 	;;
     *)
@@ -19,19 +29,24 @@ case "$cmd" in
 	    shift
 	    cmd="$cmd $subcmd"
 	fi
-	echo " 0003 New sam command is:"
-	echo "/usr/local/bin/sam $cmd --debug" "$@"
-	: shift
+	# redundant ?  we log do it later?
+	logger " 0003 New sam command is:" /usr/local/bin/sam $cmd --debug "$@"
+	# echo "/usr/local/bin/sam $cmd --debug" "$@"
+	# : shift
 	;;
 esac
 
+
+
 # separate concern:  python path / warning from 
-echo ======================  Which python:
-which python
-echo ====================== with venv -
-source  ~/SYNC/dev-SHARED/pipenvs/bag_identifier/bin/activate
-which python
-python --version
+# echo ======================  Which python:
+logger ======================  Which python: $(which python)
+if false; then
+    echo ====================== with venv -
+    source  ~/SYNC/dev-SHARED/pipenvs/bag_identifier/bin/activate
+    which python
+    python --version
+fi
 
 # quoting seems wrong -- 
 # exec /usr/local/bin/sam $cmd --debug "$@"
@@ -44,12 +59,12 @@ function c_arg() { echo "$c: $*"; c=$((c+1)); }
 
 # echo '============ just $@'
 # c=1; for a in $@; do c_arg $a; done
-
+# .. difference between $* $@ "$@" is hard ..
 echo '============ arg breakdown - quoted: "$@"'
 c=1; for a in "$@"; do c_arg $a; done
 
 echo '====================== DOIT (exec): '
-echo "exec /usr/local/bin/sam $cmd --debug $@"
+logger "exec /usr/local/bin/sam $cmd --debug $@"
 exec /usr/local/bin/sam $cmd --debug "$@"
 
 # fixed shift/subcmd --
