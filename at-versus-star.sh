@@ -5,6 +5,8 @@
 # run like this:
 # $0 "a" "a b" "a b c"
 
+# HINT:  you probably want "$@"
+
 function c_arg() { echo "$c: $*"; }
 
 echo '============ just $@'
