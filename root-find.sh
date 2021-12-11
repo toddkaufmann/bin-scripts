@@ -1,9 +1,12 @@
 #!/bin/bash
 # to do:  add inode ?
 #  fork repo, add scripts to gather interesting stats etc
-HEADER="# version: $0 2018.06.15"
+HEADER="# version: $0 2021-11-24"
 # PROG_VERSION_UUID is meant to be updated whenever file format/header changes
-PROG_VERSION_UUID='1A418825-ED2F-4B2E-94B2-33DA497384E9'
+PROG_VERSION_UUID='71AE4CD2-27CB-4ED9-A615-FB7DB1566B93'
+#
+# v1.4: PROG_VERSION_UUID='1A418825-ED2F-4B2E-94B2-33DA497384E9'
+
 # v1.3: PROG_VERSION_UUID='11739C79-F648-4C57-8023-19525165BE21'
 # v1.2: PROG_VERSION_UUID='1865F58A-EACA-4FCF-8B29-FCA21ADF9B6F'
 
@@ -25,6 +28,8 @@ set -eu
 # 11/7  with arg:  is a subdir name and filename prefix instead of root
 # 11/23 with arg:  ignore trailing slash, and convert '/' to '_' in output filename.
 # 2018.05.02 save list as .gz by default.
+# 2018-08-23 stime added
+# 2021-11-24 add ino
 
 timestamp=$(date +%Y%m%d.%H%M)
 
@@ -89,7 +94,7 @@ fi
  echo "# Filesystem: $FS :: $DEV_UUID"; \
  echo "# Folder: $(pwd -P)"; \
  time find . -xdev 2>"$out".find-err \
-     | fa stime permbits atimeh ctimeh size 2>"$out".fa-err; \
+     | fa ino nlink stime permbits atimeh ctimeh size 2>"$out".fa-err; \
  echo "# finished: $(date)") \
     | gzip > "$out.out.gz"
 
