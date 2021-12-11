@@ -10,5 +10,5 @@ timestamp=`date +%Y%m%d.%H%M`
   | egrep -v '^dev|^Volumes' \
   | sed -e 's=/==; s= =\\ =g' \
   | xargs time du -k -x ) \
-> du.$timestamp
+> $HOME/du.$timestamp
 
