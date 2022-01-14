@@ -102,7 +102,7 @@ popd
 
 
 if [ "$arg1" == "/" ]; then
-    symlink=rf.out.gz
+    symlink="$HOME/rf.out.gz"
     if [ -L "$symlink" ]; then
     echo '# adjusting symlink..'
     rm "$symlink"
