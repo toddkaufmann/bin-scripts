@@ -18,6 +18,9 @@ echo ' results in stderr (fd 2) being redirected to stdout (eg console), and std
 echo '$ cmd > afile 2>&1  '
 echo ' stdout (fd 1) goes to a file, and then stderr goes to the same place.'
 
+# TODO:
+# more complex example redirects with eg >&3 and then use of that fd later in a pipeline
+
 # cleanup 
 sleep 3
 rm "$exists" "$out"
