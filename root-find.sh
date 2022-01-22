@@ -1,5 +1,5 @@
 #!/bin/bash
-# to do:  add inode ?
+# TODO:  trap
 #  fork repo, add scripts to gather interesting stats etc
 HEADER="# version: $0 2021-11-24"
 # PROG_VERSION_UUID is meant to be updated whenever file format/header changes
@@ -71,6 +71,7 @@ echo out is : "$out"
 
 dfline=$(df . | tail -1)
 #blkdev=$(echo $dfline | sed -e 's= .*==' )
+# echo "## dfline is: '$dfline'"
 blkdev=${dfline/ */}
 #       $(echo $dfline | sed -e 's= .*==' )
 FS=${dfline/*%/}
@@ -78,6 +79,10 @@ FS=${dfline/*%/}
 if [ Darwin = "$(uname -s)" ]; then
   # works for OS X:
   DEV_UUID=$(diskutil info "$blkdev" | perl -ne 'print "$1\n" if /UUID:\s+(.*)/')
+elif [ "$blkdev" == "overlay" ]; then
+     # docker; not a 'real' blk device
+     DEV_UUID="$blkdev-$HOSTNAME"
+     echo DOCKER detected - "DEV_UUID=$DEV_UUID"
 else
     if ! [ -d "$blkdev" ]; then
 	# case for /dev/root not existing..
@@ -90,7 +95,7 @@ fi
 
 (echo "$HEADER"; \
  echo "# $PROG_VERSION_UUID"; \
- echo "# run at: $(date) on $(hostname)"; \
+ echo "# run at: $(date) on $HOSTNAME"; \
  echo "# Filesystem: $FS :: $DEV_UUID"; \
  echo "# Folder: $(pwd -P)"; \
  time find . -xdev 2>"$out".find-err \
