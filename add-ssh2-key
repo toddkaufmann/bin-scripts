@@ -14,6 +14,8 @@ fi
 # -o 'protocol 1'
 
 #cat $HOME/.ssh/id_dsa.pub \
+    # echo " ================================= is it keys or keys2 ?? ======================= "
+# 2022-05-20 change keys2 -> keys
 ssh-add -L \
   | ssh -o VisualHostKey=yes $SSH_OPTS $remote \
-  "umask 077; [ -d .ssh ] || mkdir .ssh; cd .ssh; cat >> authorized_keys2; ls -l authorized_keys2"
+  "umask 077; [ -d .ssh ] || mkdir .ssh; cd .ssh; cat >> authorized_keys; ls -l authorized_keys"
