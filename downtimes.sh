@@ -35,7 +35,9 @@ lines=(
 )
 
 prev_end_time=""
-for line in "${lines[@]}"; do
+function process_line() {
+    local line="$1"
+    
     begin_time_str=$(echo "$line" | awk '{print $3,$4,$5}')
     end_time_str=$(echo "$line" | awk -F "—" '{print $2}')
     begin_time=$(parse_time "$begin_time_str")
@@ -49,4 +51,11 @@ for line in "${lines[@]}"; do
 	echo -e "$((time_difference/60))\t$line"
     fi
     prev_end_time=$end_time
-done
+}
+
+# use test data
+# for line in "${lines[@]}"; do
+#     process_line "$line"
+# done
+
+while read line; do process_line "$line"; done

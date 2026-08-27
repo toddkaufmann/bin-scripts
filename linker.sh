@@ -24,7 +24,7 @@
 : ${DIRLIST:="linker.dirs"}
 #
 
-if [ ! -f "$DIRLIST" ]; then
+if [ ! -e "$DIRLIST" ]; then
     echo
     echo Usage:
     echo you have to at least on dir in "$DIRLIST; or run like:"
